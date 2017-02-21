@@ -1,7 +1,10 @@
+#Team Name: XYX17
+#Product Name: Habitus
+#Website: https://zxh1828.wixsite.com/habitus
 from machine import Pin, I2C
 import utime
-print('XYX17 presents the Habitus Coach!')
-############Connecting To Network#####################################
+print('XYX17 presents the Habitus Sleeping Posture Coach!')
+#################################Connecting To Network#####################################
 import network
 ap_if=network.WLAN(network.AP_IF)
 ap_if.active(False)#turn off automatic receiving
@@ -36,7 +39,7 @@ rtc=machine.RTC()
 rtc.datetime((int(time0[0:4]),int(time0[5:7]),int(time0[8:10]),0,int(time0[11:13]),int(time0[14:16]),int(time0[17:19]),int(time0[20:22])))
 print('Device time:', rtc.datetime())
 
-##############Reading and Processing of Sensor Data###################################
+######################Reading and Processing of Sensor Data################################
 def getvalues(reg_addr):
     data_l=i2c.readfrom_mem(24,reg_addr,1)
     data_h=i2c.readfrom_mem(24,reg_addr+1,1)
@@ -55,7 +58,8 @@ cycleT=1.0
 direction="IDLE" #default
 count=0 #counts cycles "AWAKE"
 countni=0 #counts cycles not "IDLE"
-listData=[] #list of tuple (direction, utime.localtime()) that can be used to plot graph (future extension)
+listData=[] #list of tuple (direction, utime.localtime()) that can be used to 
+#plot graph and log data (future extension) - see website APPLICATION: YOUR NIGHT & HOURLY REPORT
 state=True
 
 while state:
@@ -63,7 +67,7 @@ while state:
     datay=getvalues(0x2A)#reading of y axis acceleration
     dataz=getvalues(0x2C)#reading of z axis acceleration
 
-    #checking of orientation
+    #checking of orientation - note that in the actual product, indicator LEDs might not be neccessary
     #when "Awake", both LEDs light up
     if datax<-8:
         direction="Awake"
@@ -92,7 +96,10 @@ while state:
         ledr.low()
         count=0
         countni=countni+1
-    #when "Stomach Sleeping", LEDs blink (warning for bad posture)
+    #when "Stomach Sleeping", LEDs blink (warning for bad posture) - Future extension: blinking LED replaced with vibration
+    #More future extensions: bad posture(s) can be set to any posture (for example for users with bad shoulders, they might
+    #                        want to set Side Sleeping as bad posture too), note that bad posture(s) always include stomach sleeping
+    #                        Additionally, time before warning can be set too. 
     elif dataz<-7:
         direction="Stomach Sleeping"
         ledg.high()
@@ -137,4 +144,6 @@ while state:
             ledg.low()
             ledr.low()
             state=False
-      
+#Future extensions: final product has additonal sensors (see website TECH SPECS) to monitor sleeping environment 
+#                   and allows communications between Habitus and humidifers, thermostats and lights etc. 
+#                   to enable automatic controls
